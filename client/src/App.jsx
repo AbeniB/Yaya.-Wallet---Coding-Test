@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { fetchAllTransactions } from './api';
 import TransactionTable from './components/TransactionTable';
+import './App.css';
 
 const ACCOUNTS = [
   'yayawalletpi',
@@ -16,7 +17,7 @@ export default function App() {
   const [allFetched, setAllFetched] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [pageIndex, setPageIndex] = useState(0); // 0-based page index for client-side pagination
+  const [pageIndex, setPageIndex] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -24,13 +25,11 @@ export default function App() {
     loadAllTransactions();
   }, []);
 
-  // when selectedAccount or allFetched changes, compute filtered list and reset page
   useEffect(() => {
     applyFilterAndSearch(selectedAccount, searchQuery);
     setPageIndex(0);
   }, [selectedAccount, allFetched]);
 
-  // when search changes, filter within current account
   useEffect(() => {
     applyFilterAndSearch(selectedAccount, searchQuery);
     setPageIndex(0);
@@ -65,7 +64,6 @@ export default function App() {
       return sa === account || ra === account;
     });
 
-    // search only inside accountFiltered
     const q = (query || '').trim().toLowerCase();
     const searched = q === ''
       ? accountFiltered
@@ -77,12 +75,9 @@ export default function App() {
           return id.includes(q) || senderName.includes(q) || receiverName.includes(q) || cause.includes(q);
         });
 
-    // sort by created_at_time descending (most recent first)
     searched.sort((a, b) => (b.created_at_time || 0) - (a.created_at_time || 0));
-
     setFiltered(searched);
   }
-
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const currentPageItems = filtered.slice(pageIndex * PAGE_SIZE, pageIndex * PAGE_SIZE + PAGE_SIZE);
@@ -90,65 +85,94 @@ export default function App() {
   function prevPage() {
     setPageIndex(i => Math.max(0, i - 1));
   }
+  
   function nextPage() {
     setPageIndex(i => Math.min(totalPages - 1, i + 1));
   }
+  
   function goToPage(n) {
     if (n < 0 || n >= totalPages) return;
     setPageIndex(n);
   }
 
   return (
-    <div style={{ maxWidth: 1100, margin: '24px auto', padding: 12 }}>
-      <h2>YaYa Wallet — Transactions Dashboard</h2>
+    <div className="app-container">
+      <header className="app-header">
+        <h1>YaYa Wallet — Transactions Dashboard</h1>
+      </header>
 
-      <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 12 }}>
-        <label>
-          Choose account:{' '}
-          <select value={selectedAccount} onChange={e => setSelectedAccount(e.target.value)}>
+      <div className="controls-container">
+        <div className="form-group">
+          <label htmlFor="account-select">Choose account:</label>
+          <select 
+            id="account-select"
+            value={selectedAccount} 
+            onChange={e => setSelectedAccount(e.target.value)}
+            className="account-select"
+          >
             {ACCOUNTS.map(a => <option key={a} value={a}>{a}</option>)}
           </select>
-        </label>
+        </div>
 
-        <input
-          placeholder="Search this account's transactions (sender/receiver/cause/id)"
-          value={searchQuery}
-          onChange={e => setSearchQuery(e.target.value)}
-          style={{ flex: 1 }}
-        />
-
-        <button onClick={() => { setSearchQuery(''); applyFilterAndSearch(selectedAccount, ''); }}>Clear</button>
-        <button onClick={loadAllTransactions}>Refresh All</button>
+        <div className="form-group search-group">
+          <input
+            placeholder="Search transactions (sender/receiver/cause/id)"
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            className="search-input"
+          />
+          <button 
+            onClick={() => { setSearchQuery(''); applyFilterAndSearch(selectedAccount, ''); }}
+            className="btn btn-secondary"
+          >
+            Clear
+          </button>
+          <button onClick={loadAllTransactions} className="btn btn-primary">
+            Refresh All
+          </button>
+        </div>
       </div>
 
-      <div style={{ marginBottom: 8 }}>
-        {loading && <strong>Loading transactions (fetching all pages)...</strong>}
-        {error && <strong style={{ color: 'crimson' }}>Error: {error}</strong>}
+      <div className="status-container">
+        {loading && <div className="loading">Loading transactions (fetching all pages)...</div>}
+        {error && <div className="error">Error: {error}</div>}
         {!loading && !error && (
-          <div>
-            <strong>
-              Showing {filtered.length} transactions for <em>{selectedAccount}</em> — page {pageIndex + 1} / {totalPages}
-            </strong>
+          <div className="results-info">
+            Showing {filtered.length} transactions for <span className="account-name">{selectedAccount}</span> — 
+            Page {pageIndex + 1} of {totalPages}
           </div>
         )}
       </div>
 
-      <TransactionTable transactions={currentPageItems} currentAccount={selectedAccount} />
+      <div className="table-container">
+        <TransactionTable transactions={currentPageItems} currentAccount={selectedAccount} />
+      </div>
 
-      <div style={{ marginTop: 12, display: 'flex', gap: 8, alignItems: 'center' }}>
-        <button onClick={prevPage} disabled={pageIndex <= 0}>Prev</button>
-        <button onClick={nextPage} disabled={pageIndex >= totalPages - 1}>Next</button>
-
-        <span>Go to page:</span>
-        <select value={pageIndex} onChange={e => goToPage(Number(e.target.value))}>
-          {Array.from({ length: totalPages }).map((_, idx) => (
-            <option key={idx} value={idx}>{idx + 1}</option>
-          ))}
-        </select>
-
-        <span style={{ marginLeft: 8 }}>
+      <div className="pagination-container">
+        <button onClick={prevPage} disabled={pageIndex <= 0} className="btn btn-pagination">
+          Previous
+        </button>
+        
+        <div className="page-selector">
+          <span>Go to page:</span>
+          <select 
+            value={pageIndex} 
+            onChange={e => goToPage(Number(e.target.value))}
+            className="page-select"
+          >
+            {Array.from({ length: totalPages }).map((_, idx) => (
+              <option key={idx} value={idx}>{idx + 1}</option>
+            ))}
+          </select>
+        </div>
+        
+        <button onClick={nextPage} disabled={pageIndex >= totalPages - 1} className="btn btn-pagination">
+          Next
+        </button>
+        
+        <div className="page-info">
           Page {pageIndex + 1} of {totalPages} — {filtered.length} total items
-        </span>
+        </div>
       </div>
     </div>
   );

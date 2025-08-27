@@ -12,42 +12,46 @@ export default function TransactionTable({ transactions = [], currentAccount }) 
   }
 
   return (
-    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-      <thead>
-        <tr>
-          <th style={{ textAlign: 'left', padding: 8 }}>Type</th>
-          <th style={{ textAlign: 'left', padding: 8 }}>Transaction ID</th>
-          <th style={{ textAlign: 'left', padding: 8 }}>Sender</th>
-          <th style={{ textAlign: 'left', padding: 8 }}>Receiver</th>
-          <th style={{ textAlign: 'right', padding: 8 }}>Amount</th>
-          <th style={{ textAlign: 'left', padding: 8 }}>Currency</th>
-          <th style={{ textAlign: 'left', padding: 8 }}>Cause</th>
-          <th style={{ textAlign: 'left', padding: 8 }}>Created At</th>
-        </tr>
-      </thead>
-      <tbody>
-        {transactions.length === 0 && (
+    <div className="table-responsive">
+      <table className="transactions-table">
+        <thead>
           <tr>
-            <td colSpan={8} style={{ padding: 12 }}>No transactions to display.</td>
+            <th>Type</th>
+            <th>Transaction ID</th>
+            <th>Sender</th>
+            <th>Receiver</th>
+            <th className="text-right">Amount</th>
+            <th>Currency</th>
+            <th>Cause</th>
+            <th>Created At</th>
           </tr>
-        )}
-        {transactions.map(tx => {
-          const incoming = isIncoming(tx);
-          const createdAt = tx.created_at_time ? new Date(tx.created_at_time * 1000) : null;
-          return (
-            <tr key={tx.id} style={{ background: incoming ? '#e9ffef' : '#fff6f6' }}>
-              <td style={{ padding: 8 }}>{incoming ? '⬅️ Incoming' : '➡️ Outgoing'}</td>
-              <td style={{ padding: 8 }}>{tx.id}</td>
-              <td style={{ padding: 8 }}>{tx.sender?.name || tx.sender?.account}</td>
-              <td style={{ padding: 8 }}>{tx.receiver?.name || tx.receiver?.account}</td>
-              <td style={{ padding: 8, textAlign: 'right' }}>{tx.amount_with_currency ?? tx.amount}</td>
-              <td style={{ padding: 8 }}>{tx.currency}</td>
-              <td style={{ padding: 8 }}>{tx.cause}</td>
-              <td style={{ padding: 8 }}>{createdAt ? createdAt.toLocaleString() : '-'}</td>
+        </thead>
+        <tbody>
+          {transactions.length === 0 && (
+            <tr>
+              <td colSpan={8} className="no-data">
+                No transactions to display.
+              </td>
             </tr>
-          );
-        })}
-      </tbody>
-    </table>
+          )}
+          {transactions.map(tx => {
+            const incoming = isIncoming(tx);
+            const createdAt = tx.created_at_time ? new Date(tx.created_at_time * 1000) : null;
+            return (
+              <tr key={tx.id} className={incoming ? 'incoming' : 'outgoing'}>
+                <td className="transaction-type">{incoming ? '⬅️ Incoming' : '➡️ Outgoing'}</td>
+                <td className="transaction-id">{tx.id}</td>
+                <td>{tx.sender?.name || tx.sender?.account}</td>
+                <td>{tx.receiver?.name || tx.receiver?.account}</td>
+                <td className="text-right">{tx.amount_with_currency ?? tx.amount}</td>
+                <td>{tx.currency}</td>
+                <td>{tx.cause}</td>
+                <td>{createdAt ? createdAt.toLocaleString() : '-'}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
   );
 }
