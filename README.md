@@ -80,9 +80,11 @@ To test the application:
 ## Extra Information
 
 ./Brainstorming Sketch Showcase.jpg - Picture of a Sketch i made for the overall working of the webapp.
-<img src="Brainstorming%20Sketch%20Showcase.jpg" alt="Brainstorming Sketch" width="400">
+
+<img src="Brainstorming%20Sketch%20Showcase.jpg" alt="Brainstorming Sketch" width="600">
 
 
 ./Postman Testing Showcase.PNG - Picture showcasing that i tested using postman.
-<img src="Postman%20Testing%20Showcase.PNG" alt="BPostman Testing Showcase image" width="400">
+
+<img src="Postman%20Testing%20Showcase.PNG" alt="BPostman Testing Showcase image" width="600">
 
