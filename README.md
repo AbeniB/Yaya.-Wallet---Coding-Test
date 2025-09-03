@@ -80,7 +80,8 @@ To test the application:
 ## Extra Information
 
 ./Brainstorming Sketch Showcase.jpg
-![alt Brainstorming Sketch Showcase image](https://github.com/AbeniB/Yaya.-Wallet---Coding-Test/blob/main/Brainstorming Sketch Showcase.jpg?raw=true)
+
+![Brainstorming Sketch](Brainstorming%20Sketch%20Showcase.jpg)
 - Picture of a Sketch i made for the overall working of the webapp.
 
 ./Postman Testing Showcase.PNG
